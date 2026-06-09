@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>微课：抢占思维起跑线 — 幼儿园数学思维培养</title>
+<style>
+:root {
+  --primary: #f59e0b;
+  --primary-light: #fbbf24;
+  --primary-dark: #d97706;
+  --accent: #3b82f6;
+  --accent-light: #60a5fa;
+  --success: #10b981;
+  --danger: #ef4444;
+  --bg: #fffbeb;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --border: #fde68a;
+  --sidebar-bg: #1e293b;
+  --sidebar-text: #cbd5e1;
+  --sidebar-active: #f59e0b;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* === Sidebar === */
+.sidebar {
+  width: 280px; min-width: 280px;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+  transition: transform 0.3s;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.sidebar-header h3 {
+  font-size: 14px; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;
+}
+.sidebar-header .course-title {
+  font-size: 16px; font-weight: 700; color: #fff; line-height: 1.4;
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.progress-label {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: #94a3b8; margin-bottom: 8px;
+}
+.progress-bar {
+  height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--sidebar-active); border-radius: 3px;
+  transition: width 0.5s ease; width: 0%;
+}
+
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+
+.nav-section {
+  padding: 8px 20px; cursor: pointer;
+  display: flex; align-items: flex-start; gap: 12px;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+.nav-section:hover { background: rgba(255,255,255,0.05); }
+.nav-section.active {
+  background: rgba(245,158,11,0.15);
+  border-left-color: var(--sidebar-active); color: #fff;
+}
+.nav-section.completed { color: #94a3b8; }
+.nav-section.completed .nav-icon { background: var(--success); color: #fff; }
+
+.nav-icon {
+  width: 32px; height: 32px; min-width: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  color: var(--sidebar-text); transition: all 0.3s;
+}
+.nav-section.active .nav-icon { background: var(--sidebar-active); color: #fff; }
+.nav-info .nav-label { font-size: 13px; font-weight: 600; }
+.nav-info .nav-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+.nav-section.active .nav-info .nav-sub { color: #94a3b8; }
+
+.sidebar-footer {
+  padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 12px; color: #64748b;
+}
+
+/* === Study Timer === */
+.study-timer {
+  padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; gap: 10px; font-size: 13px;
+}
+.timer-icon { font-size: 16px; }
+.timer-display { color: #fff; font-weight: 700; font-variant-numeric: tabular-nums; }
+.timer-label { color: #94a3b8; font-size: 11px; }
+
+/* === Main Content === */
+.main { margin-left: 280px; flex: 1; padding: 40px; max-width: 900px; }
+
+.section { display: none; animation: fadeSlide 0.4s ease; }
+.section.active { display: block; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header { margin-bottom: 32px; }
+.section-badge {
+  display: inline-block; padding: 4px 14px;
+  background: #fef3c7; color: var(--primary-dark);
+  border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 12px;
+}
+.section-header h1 { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.section-header .duration { font-size: 14px; color: var(--text-secondary); }
+
+.card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 28px; margin-bottom: 20px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+.card-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+
+.highlight-box {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-left: 4px solid var(--primary);
+  padding: 20px 24px; border-radius: var(--radius-sm); margin: 20px 0;
+}
+.highlight-box.accent {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-left-color: var(--accent);
+}
+.highlight-box.success {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-left-color: var(--success);
+}
+
+.script-block {
+  background: #f1f5f9; padding: 20px 24px; border-radius: var(--radius-sm);
+  font-style: italic; color: #475569; position: relative; margin: 16px 0;
+}
+.script-block::before {
+  content: '🎙️ Tips';
+  position: absolute; top: -10px; left: 16px;
+  background: #475569; color: #fff;
+  padding: 2px 10px; border-radius: 10px; font-size: 11px; font-style: normal;
+}
+
+/* === Callout Grid === */
+.callout-grid { display: flex; gap: 16px; margin: 20px 0; flex-wrap: wrap; }
+.callout-item {
+  flex: 1; min-width: 150px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 20px; text-align: center;
+  box-shadow: var(--shadow);
+}
+.callout-item .icon { font-size: 32px; margin-bottom: 8px; }
+.callout-item h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.callout-item p { font-size: 12px; color: var(--text-secondary); }
+
+/* === Video === */
+.video-wrapper { margin: 24px 0; }
+.video-label {
+  font-size: 14px; font-weight: 600; color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+video { width: 100%; border-radius: var(--radius-sm); background: #000; }
+
+/* === Chart / SVG container === */
+.chart-container {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  margin: 24px 0; box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+/* === Quiz === */
+.quiz-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 28px; margin: 20px 0;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+.quiz-card.answered-correct { border-color: var(--success); background: #f0fdf4; }
+.quiz-card.answered-wrong { border-color: var(--danger); background: #fef2f2; }
+.quiz-question { font-size: 15px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-option {
+  padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.2s; display: flex; gap: 10px; align-items: flex-start;
+}
+.quiz-option:hover { border-color: var(--primary); background: #fffbeb; }
+.quiz-option.selected { border-color: var(--primary); background: #fef3c7; }
+.quiz-option.correct { border-color: var(--success); background: #f0fdf4; }
+.quiz-option.wrong { border-color: var(--danger); background: #fef2f2; }
+.quiz-option-label {
+  width: 28px; height: 28px; min-width: 28px;
+  border-radius: 50%; background: #f1f5f9;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px;
+}
+.quiz-option.correct .quiz-option-label { background: var(--success); color: #fff; }
+.quiz-option.wrong .quiz-option-label { background: var(--danger); color: #fff; }
+
+.quiz-feedback { display: none; margin-top: 20px; padding: 16px; border-radius: var(--radius-sm); font-size: 14px; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { color: #065f46; background: #d1fae5; }
+.quiz-feedback.wrong { color: #991b1b; background: #fee2e2; }
+
+/* === Dialogue === */
+.dialogue-container {
+  background: var(--card); border-radius: var(--radius);
+  padding: 28px; margin: 20px 0;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+.dialogue-scenario {
+  background: #fef3c7; padding: 14px 18px; border-radius: var(--radius-sm);
+  font-size: 13px; margin-bottom: 16px;
+}
+.customer-bubble {
+  background: #f1f5f9; padding: 16px 20px; border-radius: 12px 12px 12px 4px;
+  font-size: 14px; margin-bottom: 16px; position: relative;
+}
+.reply-input {
+  width: 100%; min-height: 100px; padding: 14px; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 14px; font-family: inherit;
+  resize: vertical; line-height: 1.6;
+}
+.reply-input:focus { outline: none; border-color: var(--primary); }
+.dialogue-actions { display: flex; gap: 12px; margin: 16px 0; }
+.ai-feedback-panel { display: none; }
+.ai-feedback-panel.show { display: block; }
+
+/* === Score Display === */
+.score-display { text-align: center; margin: 12px 0; }
+.score-circle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 72px; height: 72px; border-radius: 50%;
+  font-size: 28px; font-weight: 800; color: #fff;
+}
+.score-circle.high { background: var(--success); }
+.score-circle.medium { background: var(--accent); }
+.score-circle.low { background: var(--danger); }
+
+/* === Keyword Tags === */
+.keywords-result { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.keyword-tag {
+  padding: 4px 10px; border-radius: 14px; font-size: 12px;
+}
+.keyword-tag.found { background: #d1fae5; color: #065f46; }
+.keyword-tag.missing { background: #fee2e2; color: #991b1b; }
+
+/* === Final Task === */
+.final-task-container {
+  background: var(--card); border-radius: var(--radius);
+  padding: 28px; margin: 20px 0;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+.final-task-input {
+  width: 100%; min-height: 150px; padding: 14px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 14px; font-family: inherit; line-height: 1.7; resize: vertical;
+}
+.final-task-input:focus { outline: none; border-color: var(--primary); }
+.char-counter { text-align: right; font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+
+.eval-dimensions { display: flex; gap: 12px; flex-wrap: wrap; }
+.eval-dim {
+  flex: 1; min-width: 120px; text-align: center; padding: 16px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+}
+.eval-dim h4 { font-size: 13px; margin-bottom: 8px; }
+.eval-dim .stars { font-size: 18px; margin: 4px 0; }
+
+/* === Task Checklist === */
+.task-checklist { list-style: none; }
+.task-checklist li {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+  font-size: 14px; color: var(--text-secondary);
+}
+.task-checklist li.done { color: var(--success); }
+.task-checklist li.done .check-icon { background: var(--success); color: #fff; }
+.check-icon {
+  width: 24px; height: 24px; min-width: 24px; border-radius: 50%;
+  background: #f1f5f9; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+}
+
+/* === Section Nav Buttons === */
+.section-nav-buttons {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 32px 0; border-top: 1px solid var(--border); margin-top: 32px;
+}
+
+.btn {
+  padding: 10px 24px; border: none; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  background: var(--primary); color: #fff;
+  transition: all 0.2s;
+}
+.btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-outline {
+  background: transparent; border: 2px solid var(--border); color: var(--text);
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); background: #fffbeb; }
+.btn-success { background: var(--success); }
+.btn-success:hover { background: #059669; }
+
+/* === Toast === */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  padding: 12px 24px; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600; z-index: 999;
+  animation: toastIn 0.3s ease;
+}
+.toast.success { background: var(--success); color: #fff; }
+.toast.info { background: var(--accent); color: #fff; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Notes Panel === */
+.notes-toggle {
+  position: fixed; right: 0; top: 50%; transform: translateY(-50%);
+  background: var(--sidebar-bg); color: var(--sidebar-text);
+  border: none; padding: 14px 8px; border-radius: 8px 0 0 8px;
+  cursor: pointer; font-size: 13px;
+  writing-mode: vertical-rl; z-index: 90;
+  transition: all 0.3s; box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+}
+.notes-toggle:hover { background: var(--primary); color: #fff; padding-right: 14px; }
+
+.notes-panel {
+  position: fixed; right: -360px; top: 0; bottom: 0;
+  width: 340px; background: var(--card);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+  z-index: 95; transition: right 0.35s ease;
+  display: flex; flex-direction: column;
+}
+.notes-panel.open { right: 0; }
+.notes-header {
+  padding: 20px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.notes-header h3 { font-size: 16px; }
+.notes-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-secondary); }
+.notes-chapter-label { padding: 12px 20px; font-size: 13px; color: var(--primary-dark); font-weight: 600; background: #fffbeb; }
+.notes-textarea {
+  flex: 1; padding: 16px 20px; border: none; resize: none;
+  font-size: 14px; font-family: inherit; line-height: 1.7; outline: none;
+}
+.notes-footer {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--text-secondary);
+}
+
+/* === Certificate === */
+.certificate-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+}
+.certificate-paper {
+  background: #fff; width: 90%; max-width: 700px;
+  border-radius: var(--radius); padding: 48px 36px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  position: relative; text-align: center;
+}
+.certificate-close {
+  position: absolute; top: 16px; right: 20px;
+  background: none; border: none; font-size: 20px;
+  cursor: pointer; color: var(--text-secondary);
+}
+.cert-icon { font-size: 48px; margin-bottom: 12px; }
+.cert-title { font-size: 28px; font-weight: 800; color: var(--primary-dark); margin-bottom: 4px; }
+.cert-subtitle { font-size: 12px; color: var(--text-secondary); letter-spacing: 0.1em; margin-bottom: 24px; }
+.cert-body { font-size: 15px; line-height: 2; color: var(--text); }
+.cert-name { display: inline-block; border-bottom: 2px solid var(--primary); min-width: 120px; padding: 4px 12px; margin: 0 4px; }
+.cert-course { font-weight: 700; color: var(--primary-dark); margin: 8px 0; }
+.cert-score { margin: 20px 0; font-size: 16px; font-weight: 600; color: var(--success); }
+.cert-footer {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--text-secondary); margin-top: 32px;
+  border-top: 1px solid var(--border); padding-top: 16px;
+}
+.cert-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+
+/* === Flash Cards === */
+.flash-cards { display: flex; gap: 16px; flex-wrap: wrap; margin: 24px 0; }
+.flash-card {
+  flex: 1; min-width: 200px;
+  background: linear-gradient(135deg, #fef3c7, #fffbeb);
+  border: 2px solid #fde68a; border-radius: var(--radius-sm);
+  padding: 20px; box-shadow: var(--shadow);
+}
+.flash-card h4 { font-size: 13px; color: var(--primary-dark); margin-bottom: 8px; }
+.flash-card p { font-size: 13px; color: var(--text); line-height: 1.6; font-style: italic; }
+
+/* === Mobile Responsive === */
+.mobile-header {
+  display: none; background: var(--sidebar-bg); color: #fff;
+  padding: 12px 16px; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 50;
+}
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 99;
+}
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.show { display: block; }
+  .mobile-header { display: flex; }
+  .main { margin-left: 0; padding: 20px 16px; }
+  .section-header h1 { font-size: 22px; }
+  .card { padding: 20px; }
+  .callout-grid { flex-direction: column; }
+  .flash-cards { flex-direction: column; }
+  .section-nav-buttons { flex-direction: column; gap: 12px; }
+  .notes-toggle { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h3>AI 微课</h3>
+    <div class="course-title">抢占思维起跑线：幼儿园数学思维培养</div>
+  </div>
+  <div class="sidebar-progress">
+    <div class="progress-label">
+      <span>学习进度</span>
+      <span id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <div class="study-timer">
+    <span class="timer-icon">⏱</span>
+    <span class="timer-display" id="timerDisplay">00:00</span>
+    <span class="timer-label">学习时长</span>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav"></nav>
+  <div class="sidebar-footer">VIPTHINK · 幼儿园课程顾问培训</div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div class="mobile-header">
+  <button onclick="toggleSidebar()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">☰</button>
+  <span style="font-weight:700;font-size:14px;">抢占思维起跑线 · 微课</span>
+</div>
+
+<!-- Notes Panel -->
+<button class="notes-toggle" id="notesToggle" onclick="toggleNotes()">📝 笔记</button>
+<div class="notes-panel" id="notesPanel">
+  <div class="notes-header"><h3>📝 学习笔记</h3><button class="notes-close" onclick="toggleNotes()">✕</button></div>
+  <div class="notes-chapter-label" id="notesChapterLabel">开场</div>
+  <textarea class="notes-textarea" id="notesTextarea" placeholder="在这里记录你的学习心得、关键要点……"></textarea>
+  <div class="notes-footer">笔记自动保存 💾</div>
+</div>
+
+<!-- Certificate Overlay -->
+<div class="certificate-overlay" id="certOverlay" style="display:none;">
+  <div class="certificate-paper" id="certPaper">
+    <button class="certificate-close" onclick="closeCertificate()">✕</button>
+    <div class="cert-icon">🏆</div>
+    <div class="cert-title">结 业 证 书</div>
+    <div class="cert-subtitle">CERTIFICATE OF COMPLETION</div>
+    <div class="cert-body">
+      兹证明学员
+      <div class="cert-name" id="certStudentName" contenteditable="true">___________</div>
+      已完成 AI 微课培训课程
+      <div class="cert-course">《抢占思维起跑线：向幼儿园家长科学论证数学思维培养的必要性》</div>
+      课程主题：运用"黄金三角"模型向家长阐述幼儿园阶段数学思维培养的科学依据与长期价值
+    </div>
+    <div class="cert-score" id="certScore">综合评定：通过</div>
+    <div class="cert-footer">
+      <span id="certDate"></span>
+      <span>VIPTHINK · 课程顾问培训体系</span>
+    </div>
+    <div class="cert-actions">
+      <button class="btn" onclick="printCertificate()">🖨️ 打印证书</button>
+      <button class="btn btn-outline" onclick="closeCertificate()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main class="main" id="mainContent"></main>
+
+<script>
+// === Course Data ===
+const courseData = {
+  title: '抢占思维起跑线：向幼儿园家长科学论证数学思维培养的必要性',
+  target: '面向K1-K3（3-6岁）客户的课程顾问/销售顾问',
+  duration: '12分钟（含互动与练习）',
+  sections: [
+    {
+      id: 's0', title: '开场：直面质疑', duration: '0-1.5分钟', icon: '▶', type: 'content',
+      content: `
+        <div class="section-header">
+          <span class="section-badge">开场导入</span>
+          <h1>开场：直面质疑</h1>
+          <span class="duration">⏱ 0-1.5分钟</span>
+        </div>
+
+        <div class="highlight-box">
+          <strong>🎯 核心目标：</strong>运用「黄金三角」模型（脑科学 + 关键期 + 未来竞争力），在90秒内向家长清晰阐述数学思维培养的科学依据与长期价值。
+        </div>
+
+        <div class="script-block">
+          大家好。在拓展幼儿园阶段客户时，我们最常听到两种声音：「孩子才3岁，学数学是不是太早了？」或者「幼儿园数学不就是数数吗，我们自己也能教。」今天，我们就来系统性地攻克这个问题。我们将用一个「黄金三角」模型，从三个维度科学论证：为什么幼儿园阶段，恰恰是开启数学思维培养的黄金窗口期。
+        </div>
+
+        <div class="video-wrapper">
+          <div class="video-label">🎬 开场视频（PPT讲解）</div>
+          <video controls preload="metadata" playsinline webkit-playsinline>
+            <source src="math_ch1_kaichang.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <!-- 黄金三角 SVG -->
+        <div class="chart-container">
+          <svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gold1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#f59e0b"/>
+                <stop offset="100%" style="stop-color:#fbbf24"/>
+              </linearGradient>
+              <linearGradient id="gold2" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#3b82f6"/>
+                <stop offset="100%" style="stop-color:#60a5fa"/>
+              </linearGradient>
+              <linearGradient id="gold3" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#10b981"/>
+                <stop offset="100%" style="stop-color:#34d399"/>
+              </linearGradient>
+              <filter id="sh"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.12"/></filter>
+            </defs>
+            <text x="340" y="30" text-anchor="middle" font-size="18" font-weight="800" fill="#1e293b">黄金三角论证模型</text>
+            <!-- Triangle -->
+            <polygon points="340,60 100,280 580,280" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,4" opacity="0.3"/>
+            <!-- Corner 1 -->
+            <rect x="50" y="80" width="180" height="56" rx="10" fill="url(#gold1)" filter="url(#sh)"/>
+            <text x="140" y="103" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">🧠 脑科学</text>
+            <text x="140" y="122" text-anchor="middle" font-size="11" fill="#fef3c7">3-8岁智力发育黄金期</text>
+            <!-- Corner 2 -->
+            <rect x="250" y="80" width="180" height="56" rx="10" fill="url(#gold2)" filter="url(#sh)"/>
+            <text x="340" y="103" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">🌱 学习科学</text>
+            <text x="340" y="122" text-anchor="middle" font-size="11" fill="#dbeafe">兴趣敏感期·思维习惯</text>
+            <!-- Corner 3 -->
+            <rect x="450" y="80" width="180" height="56" rx="10" fill="url(#gold3)" filter="url(#sh)"/>
+            <text x="540" y="103" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">🚀 未来竞争力</text>
+            <text x="540" y="122" text-anchor="middle" font-size="11" fill="#d1fae5">跨越三年级分水岭</text>
+            <!-- Bottom -->
+            <rect x="220" y="260" width="240" height="44" rx="22" fill="#1e293b" filter="url(#sh)"/>
+            <text x="340" y="279" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">🏆 抢占思维起跑线</text>
+            <text x="340" y="296" text-anchor="middle" font-size="11" fill="#94a3b8">面向未来的持久竞争力</text>
+            <!-- Arrows down -->
+            <line x1="140" y1="200" x2="280" y2="260" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <line x1="340" y1="200" x2="340" y2="260" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <line x1="540" y1="200" x2="400" y2="260" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <!-- Detail labels -->
+            <text x="140" y="160" text-anchor="middle" font-size="10" fill="#64748b">神经突触爆发增长</text>
+            <text x="140" y="175" text-anchor="middle" font-size="10" fill="#64748b">完成约80%智力发展</text>
+            <text x="340" y="160" text-anchor="middle" font-size="10" fill="#64748b">保护兴趣 &gt; 学会算术</text>
+            <text x="340" y="175" text-anchor="middle" font-size="10" fill="#64748b">观察→猜想→验证</text>
+            <text x="540" y="160" text-anchor="middle" font-size="10" fill="#64748b">数感+逻辑推理+空间</text>
+            <text x="540" y="175" text-anchor="middle" font-size="10" fill="#64748b">避免三年级悬崖</text>
+          </svg>
+        </div>
+      `
+    },
+    {
+      id: 's1', title: '脑科学依据', duration: '1.5-5分钟', icon: '1',
+      type: 'content_quiz', quizId: 'quiz1',
+      content: `
+        <div class="section-header">
+          <span class="section-badge">第一支柱</span>
+          <h1>脑科学依据：3-8岁是「硬件」建设关键期</h1>
+          <span class="duration">⏱ 1.5-5分钟</span>
+        </div>
+
+        <div class="highlight-box">
+          <strong>📖 核心论点：</strong>根据<strong style="color:#d97706;">布卢姆智力发展曲线</strong>，人类的智力在17-18岁趋于成熟，但最关键的发展期就在<strong style="color:#d97706;">3-8岁</strong>，这期间完成了约<strong style="color:#d97706;">80%</strong>的智力发展。
+        </div>
+
+        <div class="script-block">
+          首先，这不是我们的主观判断，而是脑科学的结论。根据布卢姆智力发展曲线，人类的智力在17、18岁趋于成熟，但最关键的发展期就在3-8岁，这期间完成了约80%的智力发展。这个时期，孩子大脑的神经突触连接处于爆发式增长阶段。每一次有效的思维刺激，就像为大脑修建一条更宽阔、更高效的「信息高速公路」。数学思维训练——包括分类、比较、排序、空间想象、规律寻找——正是最高效的「大脑体操」。错过了这个硬件建设期，后续弥补事倍功半。
+        </div>
+
+        <div class="callout-grid">
+          <div class="callout-item"><div class="icon">🔗</div><h4>神经突触爆发</h4><p>每次思维刺激=修建信息高速</p></div>
+          <div class="callout-item"><div class="icon">📊</div><h4>80%智力发展</h4><p>3-8岁完成关键认知建构</p></div>
+          <div class="callout-item"><div class="icon">🏋️</div><h4>大脑体操</h4><p>分类·比较·排序·空间·规律</p></div>
+          <div class="callout-item"><div class="icon">⚡</div><h4>错过难补</h4><p>硬件建设期不可逆</p></div>
+        </div>
+
+        <div class="video-wrapper">
+          <div class="video-label">🎬 脑科学依据（PPT讲解视频）</div>
+          <video controls preload="metadata" playsinline webkit-playsinline>
+            <source src="math_ch2_naokexue.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <!-- Flash Cards: 应对话术 -->
+        <div class="card">
+          <div class="card-title">💡 员工记忆卡片</div>
+          <div class="flash-cards">
+            <div class="flash-card">
+              <h4>应对「太早论」</h4>
+              <p>您说得对，所以我们的重点不是教计算，而是趁3-8岁大脑发育黄金期，用游戏的方式帮孩子修建高效的「信息高速公路」。</p>
+            </div>
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 's2', title: '学习科学依据', duration: '5-8.5分钟', icon: '2',
+      type: 'content_chart_dialogue', quizId: 'quiz2',
+      content: `
+        <div class="section-header">
+          <span class="section-badge">第二支柱</span>
+          <h1>学习科学依据：在「兴趣敏感期」种下「思维习惯」</h1>
+          <span class="duration">⏱ 5-8.5分钟</span>
+        </div>
+
+        <div class="highlight-box accent">
+          <strong>📖 核心论点：</strong>「幼儿园数学」绝不是超前学习小学的算术，而是在<strong style="color:#3b82f6;">兴趣敏感期</strong>，培养受益终生的<strong style="color:#3b82f6;">「思维习惯」</strong>。保护兴趣远比学会「1+1=2」更重要。
+        </div>
+
+        <div class="script-block">
+          其次，我们要重新定义「幼儿园数学」。它绝不是超前学习小学的算术，而是在兴趣敏感期，培养受益终生的「思维习惯」。3-6岁的孩子天生好奇、爱探索。我们的游戏化探究课堂，正是利用这一特点。我们通过故事、积木、动画和动手操作，让孩子在解决「如何平分蛋糕」、「给图形排排队」、「走出这个迷宫」等有趣任务中，无痛地掌握比较、分类、归纳、空间定向等核心数学思想。在这个阶段，保护兴趣远比学会「1+1=2」更重要。
+        </div>
+
+        <div class="callout-grid">
+          <div class="callout-item"><div class="icon">🎮</div><h4>游戏化探究</h4><p>故事、积木、动画、动手</p></div>
+          <div class="callout-item"><div class="icon">🔬</div><h4>科学思维习惯</h4><p>观察→猜想→验证→归纳</p></div>
+          <div class="callout-item"><div class="icon">🌱</div><h4>种下思考种子</h4><p>培养「愿思考、爱思考」</p></div>
+        </div>
+
+        <div class="video-wrapper">
+          <div class="video-label">🎬 学习科学依据（PPT讲解视频）</div>
+          <video controls preload="metadata" playsinline webkit-playsinline>
+            <source src="math_ch3_xuexi.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <!-- Comparison Chart -->
+        <div class="chart-container">
+          <svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+            <text x="340" y="25" text-anchor="middle" font-size="16" font-weight="700" fill="#1e293b">游戏化探究 vs 填鸭式计算</text>
+            <!-- Left: 填鸭式 -->
+            <rect x="30" y="50" width="290" height="145" rx="10" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+            <text x="175" y="80" text-anchor="middle" font-size="16" font-weight="700" fill="#dc2626">❌ 填鸭式计算</text>
+            <text x="175" y="110" text-anchor="middle" font-size="12" fill="#64748b">1 + 1 = 2</text>
+            <text x="175" y="130" text-anchor="middle" font-size="12" fill="#64748b">死记硬背 · 短期记忆</text>
+            <text x="175" y="150" text-anchor="middle" font-size="12" fill="#64748b">孩子抵触 · 兴趣消磨</text>
+            <text x="175" y="170" text-anchor="middle" font-size="12" fill="#64748b">学会了计算 · 失去了思考</text>
+            <!-- Right: 游戏化 -->
+            <rect x="360" y="50" width="290" height="145" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+            <text x="505" y="80" text-anchor="middle" font-size="16" font-weight="700" fill="#059669">✅ 游戏化探究</text>
+            <text x="505" y="110" text-anchor="middle" font-size="12" fill="#64748b">如何平分蛋糕？</text>
+            <text x="505" y="130" text-anchor="middle" font-size="12" fill="#64748b">主动探索 · 深度理解</text>
+            <text x="505" y="150" text-anchor="middle" font-size="12" fill="#64748b">孩子热爱 · 兴趣驱动</text>
+            <text x="505" y="170" text-anchor="middle" font-size="12" fill="#64748b">学会了思考 · 自然会计算</text>
+            <!-- Arrow -->
+            <text x="340" y="115" text-anchor="middle" font-size="24" fill="#f59e0b">→</text>
+          </svg>
+        </div>
+
+        <div class="flash-cards">
+          <div class="flash-card">
+            <h4>应对「数数论」</h4>
+            <p>您说得对，数数只是表象。我们更关心孩子会不会比较多少、发现排列规律、理解空间关系。这是在培养数学家式的思维习惯，而不仅仅是记忆数字。</p>
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 's3', title: '未来竞争力依据', duration: '8.5-11分钟', icon: '3', type: 'content',
+      content: `
+        <div class="section-header">
+          <span class="section-badge">第三支柱</span>
+          <h1>未来竞争力依据：跨越「三年级现象」的基石</h1>
+          <span class="duration">⏱ 8.5-11分钟</span>
+        </div>
+
+        <div class="highlight-box success">
+          <strong>📖 核心论点：</strong>幼儿园的数学思维培养，直接关系到孩子能否顺利跨越小学的<strong style="color:#10b981;">「三年级分水岭」</strong>。没有早期思维训练的孩子，会遇到「看不懂题、转不过弯」的困境，成绩断崖式下滑。
+        </div>
+
+        <div class="script-block">
+          最后，幼儿园的数学思维培养，直接关系到孩子能否顺利跨越小学的「三年级分水岭」。一、二年级的数学以记忆为主，很多「聪明」孩子靠背诵就能拿高分。但三年级开始，数学的应用题、逻辑题比例陡增，真正考验的是在幼儿园阶段就该建立的数感、逻辑推理和空间想象能力。没有早期思维训练的孩子，此时会遇到「看不懂题、转不过弯」的困境，成绩断崖式下滑，信心受挫。
+        </div>
+
+        <!-- 三年级分水岭示意图 -->
+        <div class="chart-container">
+          <svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="stair" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#f59e0b"/>
+                <stop offset="100%" style="stop-color:#10b981"/>
+              </linearGradient>
+            </defs>
+            <text x="340" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#1e293b">能力阶梯：跨越「三年级分水岭」</text>
+            <!-- Steps -->
+            <rect x="50" y="220" width="120" height="40" rx="6" fill="#fbbf24"/>
+            <text x="110" y="245" text-anchor="middle" font-size="11" fill="#92400e" font-weight="700">K1-K3 思维启蒙</text>
+            <rect x="180" y="180" width="120" height="40" rx="6" fill="#f59e0b"/>
+            <text x="240" y="205" text-anchor="middle" font-size="11" fill="#fff" font-weight="700">S1-S3 兴趣习惯</text>
+            <rect x="310" y="140" width="120" height="40" rx="6" fill="#d97706"/>
+            <text x="370" y="165" text-anchor="middle" font-size="11" fill="#fff" font-weight="700">G1-G2 记忆为主</text>
+            <!-- Warning sign at G3 -->
+            <rect x="440" y="85" width="150" height="50" rx="6" fill="#ef4444"/>
+            <text x="515" y="108" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">⚠️ G3 分水岭</text>
+            <text x="515" y="126" text-anchor="middle" font-size="10" fill="#fecaca">应用题/逻辑题陡增</text>
+            <!-- Right side: future -->
+            <rect x="440" y="145" width="150" height="35" rx="6" fill="#d1fae5" stroke="#86efac" stroke-width="1"/>
+            <text x="515" y="167" text-anchor="middle" font-size="10" fill="#065f46" font-weight="600">✅ 有早期思维训练</text>
+            <rect x="440" y="185" width="150" height="35" rx="6" fill="#fee2e2" stroke="#fca5a5" stroke-width="1"/>
+            <text x="515" y="207" text-anchor="middle" font-size="10" fill="#991b1b" font-weight="600">❌ 无早期思维训练</text>
+            <!-- Arrow up -->
+            <line x1="170" y1="220" x2="310" y2="140" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <line x1="300" y1="180" x2="310" y2="140" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <line x1="430" y1="140" x2="440" y2="135" stroke="#94a3b8" stroke-width="1.5"/>
+            <text x="160" y="240" font-size="10" fill="#64748b">基础越扎实</text>
+            <text x="580" y="135" font-size="10" fill="#64748b">→ 越能应对</text>
+          </svg>
+        </div>
+
+        <div class="flash-cards">
+          <div class="flash-card">
+            <h4>应对「有什么用」</h4>
+            <p>短期看，是保护兴趣，养成爱动脑的习惯；长期看，是为三年级后越来越复杂的逻辑应用题，打下坚实的思维基础，避免「三年级滑坡」。</p>
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 's4', title: '总结：黄金三角回顾', duration: '11-12分钟', icon: '4',
+      type: 'content',
+      content: `
+        <div class="section-header">
+          <span class="section-badge">总结回顾</span>
+          <h1>总结与行动号召</h1>
+          <span class="duration">⏱ 11-12分钟</span>
+        </div>
+
+        <div class="script-block">
+          让我们回顾一下「黄金三角」论证模型：<br><br>
+          <strong>🧠 脑科学：</strong>3-8岁是智力发育黄金期（完成约80%），需科学思维刺激。<br>
+          <strong>🌱 学习科学：</strong>在兴趣敏感期，培养思维习惯比学习知识更重要。<br>
+          <strong>🚀 未来竞争力：</strong>为跨越三年级分水岭，构建可持续的学力基石。<br><br>
+          下次沟通，请结构化地使用这个模型。我们的价值不是教算术，而是在孩子大脑发育的黄金窗口期，通过游戏化的方式，为其植入科学家式的思维习惯，构建面向未来的持久竞争力。
+        </div>
+
+        <div class="video-wrapper">
+          <div class="video-label">🎬 总结回顾（PPT讲解视频）</div>
+          <video controls preload="metadata" playsinline webkit-playsinline>
+            <source src="math_ch4_zongjie.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <!-- Final Task -->
+        <div class="card final-task-container" id="finalTaskContainer">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <span style="font-size:28px;">🏆</span>
+            <h3 style="font-size:18px;font-weight:700;">终极考核：90秒模拟推介</h3>
+          </div>
+          <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">
+            <strong>场景：</strong>你正在与一位K2孩子（4-5岁）的家长沟通，对方说："这么小的孩子学数学能有什么用？不就是数数吗？"
+          </p>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
+            请运用「黄金三角」模型（脑科学+学习科学+未来竞争力），撰写一段<strong>90秒</strong>内的推介话术。
+          </p>
+          <textarea class="final-task-input" id="finalTaskInput" placeholder="请在这里撰写你的推介话术…&#10;&#10;提示：&#10;1. 脑科学：3-8岁智力发展黄金期，完成约80%&#10;2. 学习科学：兴趣敏感期，游戏化探究培养思维习惯&#10;3. 未来竞争力：为跨越三年级分水岭做准备"></textarea>
+          <div class="char-counter" id="finalCharCount">0 / 500字</div>
+          <div style="margin-top:12px;display:flex;gap:12px;">
+            <button class="btn" id="finalSubmitBtn" onclick="submitFinalTask()">✉️ 提交考核</button>
+            <button class="btn btn-outline" onclick="resetFinalTask()">🔄 重新作答</button>
+          </div>
+          <div id="finalFeedback" style="display:none;margin-top:20px;"></div>
+        </div>
+
+        <!-- Task Checklist -->
+        <div class="card">
+          <div class="card-title">✅ 考核与评估方案</div>
+          <ul class="task-checklist">
+            <li id="checklist1"><span class="check-icon">1</span><span>随堂测验：完成互动练习1（脑科学选择题）</span></li>
+            <li id="checklist2"><span class="check-icon">2</span><span>课后练习：完成互动练习2（AI模拟对话），评分 ≥ 80分</span></li>
+            <li id="checklist3"><span class="check-icon">3</span><span>终极考核：完成90秒模拟推介，三项维度评分通过</span></li>
+          </ul>
+        </div>
+      `
+    }
+  ]
+};
+
+// === Quiz Data ===
+const quizzes = {
+  quiz1: {
+    quizId: 'quiz1',
+    question: '当家长说"孩子太小，大脑还没发育好，学不了数学"时，最佳回应是：',
+    options: [
+      { label: 'A', text: '"不早啦，别的孩子都在学。"' },
+      { label: 'B', text: '"我们的课程很简单，就是玩游戏。"' },
+      { label: 'C', text: '"您说得对，正因为大脑处于黄金发育期（3-8岁完成80%智力发展），才更需要科学的思维刺激来构建高效的神经网络，为以后的学习打下坚实的硬件基础。"' },
+      { label: 'D', text: '"那等小学再学吧。"' }
+    ],
+    correct: 2,
+    feedback_correct: '✅ <strong>回答正确！</strong>选项C既认同了家长的观察，又巧妙地用脑科学知识将其转化为我们的论据，体现了专业性。这正是"黄金三角"第一支柱的标准运用。',
+    feedback_wrong: '❌ <strong>还需加强。</strong>选项A容易引发比较焦虑，选项B回避了问题本质，选项D直接放弃了沟通。正确做法是：先认同家长的感受（"您说得对"），然后用脑科学依据进行有说服力的反转论证。'
+  },
+  quiz2: {
+    isDialogue: true,
+    question: '家长说："幼儿园数学不就是数数、认图形吗？我自己在家也能教，为什么要报你们的课程？"请运用「黄金三角」模型中的脑科学和学习科学两个维度来回应：',
+    expectedKeywords: [
+      { word: '脑科学', weight: 15 },
+      { word: '黄金期', weight: 15 },
+      { word: '游戏化', weight: 15 },
+      { word: '兴趣', weight: 12 },
+      { word: '思维习惯', weight: 12 },
+      { word: '神经网络', weight: 10 },
+      { word: '分类', weight: 7 },
+      { word: '比较', weight: 7 },
+      { word: '空间', weight: 7 }
+    ],
+    scenario: '你正在与一位K1孩子的家长沟通，对方认为自己在家也能教孩子认数字、做算术。'
+  }
+};
+
+// === State ===
+let currentSection = 0;
+let completedSections = new Set();
+let quiz1Answered = false;
+let quiz2Answered = false;
+let quiz2Score = 0;
+let finalTaskSubmitted = false;
+let finalScore = 0;
+
+let studySeconds = 0;
+let timerInterval = null;
+
+// === Init ===
+function init() {
+  renderSidebar();
+  renderSections();
+  navigateTo(0);
+  setupQuizListeners();
+  setupFinalTaskListener();
+  startTimer();
+  loadNotes();
+  loadProgress();
+}
+
+function renderSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  nav.innerHTML = courseData.sections.map((s, i) => `
+    <div class="nav-section" data-index="${i}" onclick="navigateTo(${i})">
+      <div class="nav-icon">${s.icon}</div>
+      <div class="nav-info">
+        <div class="nav-label">${s.title}</div>
+        <div class="nav-sub">⏱ ${s.duration}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderSections() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = courseData.sections.map((s, i) => `
+    <div class="section" data-section="${i}">
+      ${s.content}
+      ${s.type === 'content_quiz' ? renderQuiz(quizzes[s.quizId], i) : ''}
+      ${s.type === 'content_chart_dialogue' ? renderDialogue(quizzes[s.quizId], i) : ''}
+      <div class="section-nav-buttons">
+        <div>${i > 0 ? `<button class="btn btn-outline" onclick="navigateTo(${i-1})">← 上一章</button>` : ''}</div>
+        <div>${i < courseData.sections.length - 1 ? `<button class="btn" onclick="markComplete(${i});navigateTo(${i+1})">下一章 →</button>` : `<button class="btn btn-success" onclick="markComplete(${i})">✓ 完成课程</button>`}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderQuiz(quiz, sectionIndex) {
+  if (!quiz || quiz.isDialogue) return '';
+  return `
+    <div class="quiz-card" id="quiz-${quiz.quizId || sectionIndex}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="font-size:24px;">✍️</span>
+        <h3 style="font-size:16px;font-weight:700;">互动练习：选择题</h3>
+      </div>
+      <div class="quiz-question">${quiz.question}</div>
+      <div class="quiz-options">
+        ${quiz.options.map((opt, oi) => `
+          <div class="quiz-option" data-option="${oi}" onclick="selectQuizOption(this, ${oi}, '${quiz.quizId || sectionIndex}')">
+            <span class="quiz-option-label">${opt.label}</span>
+            <span>${opt.text}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="feedback-${quiz.quizId || sectionIndex}"></div>
+    </div>
+  `;
+}
+
+function renderDialogue(quiz, sectionIndex) {
+  if (!quiz || !quiz.isDialogue) return '';
+  return `
+    <div class="dialogue-container" id="dialogue-container">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="font-size:24px;">🤖</span>
+        <h3 style="font-size:16px;font-weight:700;">互动练习：AI模拟对话</h3>
+      </div>
+      <div class="dialogue-scenario"><strong>📋 场景设定</strong>${quiz.scenario}</div>
+      <div class="customer-bubble">${quiz.question}</div>
+      <textarea class="reply-input" id="dialogueInput" placeholder="请运用黄金三角模型组织你的回应..."></textarea>
+      <div class="dialogue-actions">
+        <button class="btn" id="submitDialogueBtn" onclick="submitDialogue()">提交回答</button>
+        <button class="btn btn-outline" onclick="resetDialogue()">重新作答</button>
+      </div>
+      <div class="ai-feedback-panel" id="dialogueFeedback"></div>
+    </div>
+  `;
+}
+
+function navigateTo(index) {
+  currentSection = index;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-section').forEach(n => n.classList.remove('active'));
+  const section = document.querySelector(`.section[data-section="${index}"]`);
+  if (section) section.classList.add('active');
+  const navItem = document.querySelector(`.nav-section[data-index="${index}"]`);
+  if (navItem) navItem.classList.add('active');
+  updateProgress();
+  updateNotesForSection(index);
+  saveProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+function markComplete(index) {
+  completedSections.add(index);
+  updateProgress();
+  updateChecklist();
+  saveProgress();
+  showToast('「' + courseData.sections[index].title + '」已完成 ✓', 'success');
+}
+
+function updateProgress() {
+  const total = courseData.sections.length;
+  const viewed = new Set([...completedSections, currentSection]);
+  const pct = Math.round((viewed.size / total) * 100);
+  document.getElementById('progressPercent').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.querySelectorAll('.nav-section').forEach((el, i) => {
+    if (completedSections.has(i)) el.classList.add('completed');
+  });
+}
+
+function updateChecklist() {
+  if (quiz1Answered) {
+    const el = document.getElementById('checklist1');
+    if (el) { el.classList.add('done'); el.querySelector('.check-icon').textContent = '✓'; }
+  }
+  if (quiz2Answered && quiz2Score >= 80) {
+    const el = document.getElementById('checklist2');
+    if (el) { el.classList.add('done'); el.querySelector('.check-icon').textContent = '✓'; }
+  }
+  if (finalTaskSubmitted) {
+    const el = document.getElementById('checklist3');
+    if (el) { el.classList.add('done'); el.querySelector('.check-icon').textContent = '✓'; }
+  }
+}
+
+// === Quiz 1: Multiple Choice ===
+function selectQuizOption(el, optionIndex, quizId) {
+  if (quiz1Answered) return;
+  const quizCard = document.getElementById('quiz-' + quizId);
+  const quiz = quizzes.quiz1;
+  const feedback = document.getElementById('feedback-' + quizId);
+  quizCard.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected', 'correct', 'wrong'));
+  el.classList.add('selected');
+  quiz1Answered = true;
+  quizCard.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+  if (optionIndex === quiz.correct) {
+    el.classList.add('correct');
+    quizCard.classList.add('answered-correct');
+    feedback.className = 'quiz-feedback show correct';
+    feedback.innerHTML = quiz.feedback_correct;
+  } else {
+    el.classList.add('wrong');
+    quizCard.classList.add('answered-wrong');
+    quizCard.querySelectorAll('.quiz-option')[quiz.correct].classList.add('correct');
+    feedback.className = 'quiz-feedback show wrong';
+    feedback.innerHTML = quiz.feedback_wrong;
+  }
+  updateChecklist(); saveProgress(); checkCertificate();
+}
+
+// === Quiz 2: AI Dialogue ===
+function submitDialogue() {
+  if (quiz2Answered) return;
+  const input = document.getElementById('dialogueInput');
+  const text = input.value.trim();
+  if (!text) { showToast('请先输入你的回答', 'info'); return; }
+  const quiz = quizzes.quiz2;
+  const feedback = document.getElementById('dialogueFeedback');
+  const lowerText = text.toLowerCase();
+  let totalScore = 0;
+  const keywordResults = quiz.expectedKeywords.map(kw => {
+    const found = lowerText.includes(kw.word.toLowerCase());
+    if (found) totalScore += kw.weight;
+    return { ...kw, found };
+  });
+  if (text.length >= 60) totalScore += 5;
+  if (text.length >= 120) totalScore += 5;
+  quiz2Score = Math.min(100, totalScore);
+  quiz2Answered = true;
+  let scoreLevel = quiz2Score >= 80 ? 'high' : quiz2Score >= 60 ? 'medium' : 'low';
+  let feedbackMsg = '';
+  if (quiz2Score >= 80) feedbackMsg = '<p style="font-size:16px;font-weight:700;color:#065f46;margin-bottom:8px;">🎉 优秀！你的回答充分运用了黄金三角模型。</p>';
+  else if (quiz2Score >= 60) feedbackMsg = '<p style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:8px;">👍 不错！还有提升空间。</p>';
+  else feedbackMsg = '<p style="font-size:16px;font-weight:700;color:#991b1b;margin-bottom:8px;">📚 需要更多练习。建议回顾课程内容后再试。</p>';
+  feedbackMsg += '<p style="font-size:13px;color:#64748b;margin-bottom:12px;">AI评估基于以下关键点检测：</p>';
+  feedbackMsg += '<div class="keywords-result">';
+  keywordResults.forEach(kr => {
+    feedbackMsg += '<span class="keyword-tag ' + (kr.found ? 'found' : 'missing') + '">' + (kr.found ? '✓' : '✗') + ' ' + kr.word + ' (' + kr.weight + '分)</span>';
+  });
+  if (text.length >= 60) feedbackMsg += '<span class="keyword-tag found">✓ 回答长度充足 (+5分)</span>';
+  if (text.length >= 120) feedbackMsg += '<span class="keyword-tag found">✓ 回答详尽 (+5分)</span>';
+  feedbackMsg += '</div>';
+  const missingKeywords = keywordResults.filter(k => !k.found);
+  if (missingKeywords.length > 0) {
+    feedbackMsg += '<div style="margin-top:16px;padding:12px;background:#fef2f2;border-radius:8px;font-size:13px;color:#991b1b;"><strong>💡 优化建议：</strong>你的回答中缺少以下关键要素：<br>';
+    feedbackMsg += missingKeywords.map(k => '· <strong>' + k.word + '</strong>').join('<br>');
+    feedbackMsg += '<br>建议将这些要素融入回答中，使说服力更强。</div>';
+  }
+  feedback.innerHTML = '<div class="score-display"><div class="score-circle ' + scoreLevel + '">' + quiz2Score + '</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">综合评分</div></div>' + feedbackMsg + (quiz2Score >= 80 ? '<div style="margin-top:12px;padding:12px;background:#ecfdf5;border-radius:8px;font-size:13px;color:#065f46;"><strong>✅ 练习通过！</strong>评分达到80分以上。</div>' : '');
+  feedback.classList.add('show');
+  document.getElementById('submitDialogueBtn').disabled = true;
+  input.disabled = true;
+  updateChecklist(); saveProgress(); checkCertificate();
+}
+
+function resetDialogue() {
+  quiz2Answered = false; quiz2Score = 0;
+  document.getElementById('dialogueInput').value = '';
+  document.getElementById('dialogueInput').disabled = false;
+  document.getElementById('submitDialogueBtn').disabled = false;
+  document.getElementById('dialogueFeedback').classList.remove('show');
+  document.getElementById('dialogueFeedback').innerHTML = '';
+  updateChecklist();
+}
+
+function setupQuizListeners() {
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+      const dialogueInput = document.getElementById('dialogueInput');
+      if (dialogueInput && document.activeElement === dialogueInput) submitDialogue();
+    }
+  });
+}
+
+function setupFinalTaskListener() {
+  const input = document.getElementById('finalTaskInput');
+  if (input) input.addEventListener('input', function() {
+    document.getElementById('finalCharCount').textContent = this.value.length + ' / 500字';
+  });
+}
+
+// === Final Task ===
+function submitFinalTask() {
+  const input = document.getElementById('finalTaskInput');
+  const text = input.value.trim();
+  if (!text) { showToast('请先输入你的模拟推介话术', 'info'); return; }
+  finalTaskSubmitted = true;
+
+  const hasBrain = /脑科学|黄金期|80%|神经网络|大脑|智力|3.8岁/.test(text);
+  const hasLearn = /学习科学|兴趣|游戏|思维习惯|观察|猜想|探究/.test(text);
+  const hasFuture = /竞争力|三年级|分水岭|未来|长期|学力/.test(text);
+
+  let dim1Score = 0;
+  if (hasBrain) dim1Score += 34;
+  if (hasLearn) dim1Score += 33;
+  if (hasFuture) dim1Score += 33;
+  const dim2Score = Math.min(100, (text.includes('为什么') ? 20 : 0) + (text.length >= 80 ? 30 : text.length) + (text.length >= 150 ? 30 : 10) + 20);
+  const dim3Score = Math.min(100, text.length >= 100 ? 40 + Math.min(60, Math.floor(text.length / 3)) : Math.min(40, Math.floor(text.length / 2)));
+
+  const totalScore = Math.round((dim1Score + dim2Score + dim3Score) / 3);
+  finalScore = totalScore;
+
+  const starEmojis = ['⭐', '⭐⭐', '⭐⭐⭐', '🌟🌟', '🌟🌟🌟'];
+  const feedbackEl = document.getElementById('finalFeedback');
+  feedbackEl.style.display = 'block';
+
+  let verdict = '';
+  if (totalScore >= 80) verdict = '🎉 <strong>通关成功！</strong>你的推介话术结构完整，论据有力，已能够独立完成90秒标准推介。';
+  else if (totalScore >= 60) verdict = '👍 <strong>基本通过。</strong>建议对照黄金三角再加强。';
+  else verdict = '📚 <strong>需要重新练习。</strong>请回顾课程三大支柱，组织语言后再次提交。';
+
+  feedbackEl.innerHTML = `
+    <div class="card" style="border:2px solid ${totalScore >= 80 ? 'var(--success)' : totalScore >= 60 ? 'var(--accent)' : 'var(--danger)'}">
+      <div class="score-display">
+        <div class="score-circle ${totalScore >= 80 ? 'high' : totalScore >= 60 ? 'medium' : 'low'}">${totalScore}</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">综合评分</div>
+      </div>
+      <div class="eval-dimensions" style="margin-top:20px;">
+        <div class="eval-dim" style="border-color:${dim1Score >= 70 ? 'var(--success)' : 'var(--danger)'}">
+          <h4>📐 三角完整性</h4>
+          <div class="stars">${starEmojis[Math.floor(dim1Score / 20)]}</div>
+          <p style="font-size:12px;color:var(--text-secondary);">${dim1Score}分</p>
+        </div>
+        <div class="eval-dim" style="border-color:${dim2Score >= 70 ? 'var(--success)' : 'var(--danger)'}">
+          <h4>🎯 说服力</h4>
+          <div class="stars">${starEmojis[Math.floor(dim2Score / 20)]}</div>
+          <p style="font-size:12px;color:var(--text-secondary);">${dim2Score}分</p>
+        </div>
+        <div class="eval-dim" style="border-color:${dim3Score >= 70 ? 'var(--success)' : 'var(--danger)'}">
+          <h4>💬 表达流畅度</h4>
+          <div class="stars">${starEmojis[Math.floor(dim3Score / 20)]}</div>
+          <p style="font-size:12px;color:var(--text-secondary);">${dim3Score}分</p>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:16px;background:${totalScore >= 80 ? '#ecfdf5' : totalScore >= 60 ? '#fffbeb' : '#fef2f2'};border-radius:8px;font-size:14px;">${verdict}</div>
+    </div>
+  `;
+
+  updateChecklist(); saveProgress();
+  input.disabled = true;
+  showToast('通关任务已提交！', 'success');
+  checkCertificate();
+}
+
+function resetFinalTask() {
+  finalTaskSubmitted = false; finalScore = 0;
+  document.getElementById('finalTaskInput').value = '';
+  document.getElementById('finalTaskInput').disabled = false;
+  document.getElementById('finalFeedback').style.display = 'none';
+  document.getElementById('finalFeedback').innerHTML = '';
+  document.getElementById('finalCharCount').textContent = '0 / 500字';
+  updateChecklist();
+}
+
+// === Timer ===
+function startTimer() {
+  const saved = localStorage.getItem('vipthink_math_study_seconds');
+  if (saved) studySeconds = parseInt(saved);
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    studySeconds++;
+    updateTimerDisplay();
+    if (studySeconds % 10 === 0) localStorage.setItem('vipthink_math_study_seconds', studySeconds);
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(studySeconds / 60);
+  const secs = studySeconds % 60;
+  const el = document.getElementById('timerDisplay');
+  if (el) el.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+}
+
+// === Notes ===
+function toggleNotes() {
+  document.getElementById('notesPanel').classList.toggle('open');
+}
+
+function loadNotes() {
+  updateNotesForSection(currentSection, JSON.parse(localStorage.getItem('vipthink_math_notes') || '{}'));
+}
+
+function updateNotesForSection(index, allNotes) {
+  allNotes = allNotes || JSON.parse(localStorage.getItem('vipthink_math_notes') || '{}');
+  const key = 'ch_' + index;
+  const label = document.getElementById('notesChapterLabel');
+  const textarea = document.getElementById('notesTextarea');
+  if (label) label.textContent = courseData.sections[index].title;
+  if (textarea) {
+    textarea.value = allNotes[key] || '';
+    textarea.dataset.chapterKey = key;
+  }
+}
+
+function saveNotes() {
+  const textarea = document.getElementById('notesTextarea');
+  if (!textarea) return;
+  const key = textarea.dataset.chapterKey || ('ch_' + currentSection);
+  const allNotes = JSON.parse(localStorage.getItem('vipthink_math_notes') || '{}');
+  allNotes[key] = textarea.value;
+  localStorage.setItem('vipthink_math_notes', JSON.stringify(allNotes));
+}
+
+// === Progress Persistence ===
+function loadProgress() {
+  const saved = JSON.parse(localStorage.getItem('vipthink_math_progress') || '{}');
+  if (saved.quiz1Answered) quiz1Answered = true;
+  if (saved.quiz2Answered) quiz2Answered = true;
+  if (saved.quiz2Score) quiz2Score = saved.quiz2Score;
+  if (saved.finalTaskSubmitted) finalTaskSubmitted = true;
+  if (saved.finalScore) finalScore = saved.finalScore;
+  if (saved.completedSections) completedSections = new Set(saved.completedSections);
+  if (saved.currentSection !== undefined) currentSection = saved.currentSection;
+  setTimeout(() => { navigateTo(currentSection); updateChecklist(); }, 100);
+}
+
+function saveProgress() {
+  localStorage.setItem('vipthink_math_progress', JSON.stringify({
+    quiz1Answered, quiz2Answered, quiz2Score,
+    finalTaskSubmitted, finalScore,
+    completedSections: [...completedSections],
+    currentSection
+  }));
+}
+
+// === Certificate ===
+function checkCertificate() {
+  if (quiz1Answered && quiz2Answered && quiz2Score >= 80 && finalTaskSubmitted) {
+    setTimeout(() => showCertificate(), 1500);
+  }
+}
+
+function showCertificate() {
+  const overlay = document.getElementById('certOverlay');
+  document.getElementById('certDate').textContent = new Date().toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' });
+  document.getElementById('certScore').textContent = '综合评定：通过 · 练习得分 ' + quiz2Score + '分 · 终极考核 ' + finalScore + '分';
+  overlay.style.display = 'flex';
+}
+
+function closeCertificate() {
+  document.getElementById('certOverlay').style.display = 'none';
+}
+
+function printCertificate() {
+  const overlay = document.getElementById('certOverlay');
+  const paper = document.getElementById('certPaper');
+  const closeBtn = paper.querySelector('.certificate-close');
+  const actions = paper.querySelector('.cert-actions');
+  if (closeBtn) closeBtn.style.display = 'none';
+  if (actions) actions.style.display = 'none';
+  overlay.style.background = '#fff';
+  window.print();
+  if (closeBtn) closeBtn.style.display = '';
+  if (actions) actions.style.display = '';
+  overlay.style.background = '';
+}
+
+// === Helpers ===
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+
+function showToast(msg, type) {
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// === Init ===
+document.addEventListener('DOMContentLoaded', init);
+
+// Auto-save notes
+document.addEventListener('input', function(e) {
+  if (e.target.id === 'notesTextarea') {
+    clearTimeout(e.target._saveTimeout);
+    e.target._saveTimeout = setTimeout(saveNotes, 500);
+  }
+});
+
+// Save before leaving
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('vipthink_math_study_seconds', studySeconds);
+  saveNotes();
+  saveProgress();
+});
+</script>
+
+</body>
+</html>

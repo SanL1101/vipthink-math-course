@@ -91,6 +91,7 @@ body {
 }
 .nav-section.completed { color: #94a3b8; }
 .nav-section.completed .nav-icon { background: var(--success); color: #fff; }
+.nav-section.locked { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
 
 .nav-icon {
   width: 32px; height: 32px; min-width: 32px; border-radius: 50%;
@@ -403,7 +404,8 @@ video { width: 100%; border-radius: var(--radius-sm); background: #000; }
 .cert-body { font-size: 15px; line-height: 2; color: var(--text); }
 .cert-name { display: inline-block; border-bottom: 2px solid var(--primary); min-width: 120px; padding: 4px 12px; margin: 0 4px; }
 .cert-course { font-weight: 700; color: var(--primary-dark); margin: 8px 0; }
-.cert-score { margin: 20px 0; font-size: 16px; font-weight: 600; color: var(--success); }
+.cert-score { margin: 20px 0 8px; font-size: 16px; font-weight: 600; color: var(--success); }
+.cert-final-score { margin: 0 0 12px; font-size: 14px; font-weight: 600; color: var(--accent); }
 .cert-footer {
   display: flex; justify-content: space-between;
   font-size: 12px; color: var(--text-secondary); margin-top: 32px;
@@ -423,10 +425,21 @@ video { width: 100%; border-radius: var(--radius-sm); background: #000; }
 .flash-card p { font-size: 13px; color: var(--text); line-height: 1.6; font-style: italic; }
 
 /* === Mobile Responsive === */
+.sidebar-close-btn {
+  display: none; position: absolute; top: 12px; right: 12px;
+  background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; z-index: 101;
+}
 .mobile-header {
   display: none; background: var(--sidebar-bg); color: #fff;
   padding: 12px 16px; align-items: center; gap: 12px;
   position: sticky; top: 0; z-index: 50;
+}
+.mobile-progress-bar {
+  display: none; height: 3px; background: rgba(255,255,255,0.1);
+  position: sticky; top: 48px; z-index: 49;
+}
+.mobile-progress-bar .progress-fill {
+  height: 100%; background: var(--sidebar-active); transition: width 0.5s ease; width: 0%;
 }
 .sidebar-overlay {
   display: none; position: fixed; inset: 0;
@@ -436,8 +449,10 @@ video { width: 100%; border-radius: var(--radius-sm); background: #000; }
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
+  .sidebar-close-btn { display: block; }
   .sidebar-overlay.show { display: block; }
   .mobile-header { display: flex; }
+  .mobile-progress-bar { display: block; }
   .main { margin-left: 0; padding: 20px 16px; }
   .section-header h1 { font-size: 22px; }
   .card { padding: 20px; }
@@ -450,16 +465,9 @@ video { width: 100%; border-radius: var(--radius-sm); background: #000; }
 </head>
 <body>
 
-<!-- 课程导航横幅 -->
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); text-align: center; padding: 10px; font-size: 14px; position: sticky; top: 0; z-index: 9999;">
-  <span style="color: rgba(255,255,255,0.7);">📚 更多课程 &nbsp;|&nbsp;</span>
-  <a href="./refund/" style="color: #fff; font-weight: bold; text-decoration: none; border-bottom: 2px solid #ffd700; padding-bottom: 2px;">
-    🛡️ 退费挽单实战演练：规则、流程与高阶话术
-  </a>
-</div>
-
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
+  <button class="sidebar-close-btn" onclick="toggleSidebar()">✕</button>
   <div class="sidebar-header">
     <h3>AI 微课</h3>
     <div class="course-title">抢占思维起跑线：幼儿园数学思维培养</div>
@@ -486,6 +494,7 @@ video { width: 100%; border-radius: var(--radius-sm); background: #000; }
   <button onclick="toggleSidebar()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">☰</button>
   <span style="font-weight:700;font-size:14px;">抢占思维起跑线 · 微课</span>
 </div>
+<div class="mobile-progress-bar"><div class="progress-fill" id="mobileProgressFill"></div></div>
 
 <!-- Notes Panel -->
 <button class="notes-toggle" id="notesToggle" onclick="toggleNotes()">📝 笔记</button>
@@ -511,6 +520,7 @@ video { width: 100%; border-radius: var(--radius-sm); background: #000; }
       课程主题：运用"黄金三角"模型向家长阐述幼儿园阶段数学思维培养的科学依据与长期价值
     </div>
     <div class="cert-score" id="certScore">综合评定：通过</div>
+    <div class="cert-final-score" id="certFinalScore">终极考核得分：-- 分</div>
     <div class="cert-footer">
       <span id="certDate"></span>
       <span>VIPTHINK · 课程顾问培训体系</span>
@@ -860,15 +870,12 @@ const quizzes = {
     isDialogue: true,
     question: '家长说："幼儿园数学不就是数数、认图形吗？我自己在家也能教，为什么要报你们的课程？"请运用「黄金三角」模型中的脑科学和学习科学两个维度来回应：',
     expectedKeywords: [
-      { word: '脑科学', weight: 15 },
-      { word: '黄金期', weight: 15 },
-      { word: '游戏化', weight: 15 },
-      { word: '兴趣', weight: 12 },
-      { word: '思维习惯', weight: 12 },
-      { word: '神经网络', weight: 10 },
-      { word: '分类', weight: 7 },
-      { word: '比较', weight: 7 },
-      { word: '空间', weight: 7 }
+      { concept: '脑科学/黄金期', terms: ['脑科学','黄金期','大脑','神经系统','智力','关键期','3.8岁','80%','发育','神经网络','认知'], weight: 18 },
+      { concept: '游戏化/学习科学', terms: ['游戏化','玩游戏','趣味','互动','游戏','动画','闯关','故事','情境','动手','探索'], weight: 18 },
+      { concept: '思维习惯培养', terms: ['思维习惯','思维培养','思维能力','思考方式','思考能力','思维方式','思维训练','思维模式','思维'], weight: 16 },
+      { concept: '激发兴趣', terms: ['兴趣','激发','喜欢','乐趣','好奇心','探索欲','学习动力','积极性','主动'], weight: 14 },
+      { concept: '课程优势对比', terms: ['课程','专业','小班','体系','系统','科学','完整','结构化','标准','研发','教材'], weight: 12 },
+      { concept: '长期价值/竞争力', terms: ['长期','未来','竞争力','基础','分水岭','三年级','小升初','学力','受益','长远'], weight: 12 }
     ],
     scenario: '你正在与一位K1孩子的家长沟通，对方认为自己在家也能教孩子认数字、做算术。'
   }
@@ -920,7 +927,7 @@ function renderSections() {
       ${s.type === 'content_chart_dialogue' ? renderDialogue(quizzes[s.quizId], i) : ''}
       <div class="section-nav-buttons">
         <div>${i > 0 ? `<button class="btn btn-outline" onclick="navigateTo(${i-1})">← 上一章</button>` : ''}</div>
-        <div>${i < courseData.sections.length - 1 ? `<button class="btn" onclick="markComplete(${i});navigateTo(${i+1})">下一章 →</button>` : `<button class="btn btn-success" onclick="markComplete(${i})">✓ 完成课程</button>`}</div>
+        <div>${i < courseData.sections.length - 1 ? `<button class="btn" onclick="markComplete(${i});navigateTo(${i+1})">下一章 →</button>` : `<button class="btn btn-success" onclick="tryCompleteCourse(${i})">✓ 完成课程</button>`}</div>
       </div>
     </div>
   `).join('');
@@ -969,6 +976,8 @@ function renderDialogue(quiz, sectionIndex) {
 }
 
 function navigateTo(index) {
+  const check = canNavigateTo(index);
+  if (!check.ok) { showToast(check.msg, 'warning'); return; }
   currentSection = index;
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-section').forEach(n => n.classList.remove('active'));
@@ -977,6 +986,7 @@ function navigateTo(index) {
   const navItem = document.querySelector(`.nav-section[data-index="${index}"]`);
   if (navItem) navItem.classList.add('active');
   updateProgress();
+  updateSidebarLocks();
   updateNotesForSection(index);
   saveProgress();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -984,9 +994,36 @@ function navigateTo(index) {
   document.getElementById('sidebarOverlay').classList.remove('show');
 }
 
+function canNavigateTo(index) {
+  if (index === 0) return { ok: true };
+  if (index === 1) return { ok: true };
+  if (index === 2 && !quiz1Answered) return { ok: false, msg: '请先完成第1章的互动选择题' };
+  if (index === 3 && !quiz2Answered) return { ok: false, msg: '请先完成第2章的AI模拟对话' };
+  if (index === 3 && quiz2Score < 60) return { ok: false, msg: 'AI模拟对话得分未达60分，请重新练习' };
+  if (index === 4 && !quiz1Answered) return { ok: false, msg: '请先完成第1章的选择题' };
+  if (index === 4 && !quiz2Answered) return { ok: false, msg: '请先完成第2章的AI模拟对话' };
+  if (index === 4 && quiz2Score < 60) return { ok: false, msg: 'AI模拟对话得分未达60分，请先通过练习' };
+  return { ok: true };
+}
+
+function updateSidebarLocks() {
+  document.querySelectorAll('.nav-section').forEach((el, i) => {
+    const check = canNavigateTo(i);
+    if (!check.ok) el.classList.add('locked');
+    else el.classList.remove('locked');
+  });
+}
+
+function tryCompleteCourse(index) {
+  if (!finalTaskSubmitted) { showToast('请先完成通关考核并提交答案', 'warning'); return; }
+  if (finalScore < 60) { showToast('通关考核得分未达60分（当前' + finalScore + '分），请重新作答', 'warning'); return; }
+  markComplete(index);
+}
+
 function markComplete(index) {
   completedSections.add(index);
   updateProgress();
+  updateSidebarLocks();
   updateChecklist();
   saveProgress();
   showToast('「' + courseData.sections[index].title + '」已完成 ✓', 'success');
@@ -998,6 +1035,8 @@ function updateProgress() {
   const pct = Math.round((viewed.size / total) * 100);
   document.getElementById('progressPercent').textContent = pct + '%';
   document.getElementById('progressFill').style.width = pct + '%';
+  const mpf = document.getElementById('mobileProgressFill');
+  if (mpf) mpf.style.width = pct + '%';
   document.querySelectorAll('.nav-section').forEach((el, i) => {
     if (completedSections.has(i)) el.classList.add('completed');
   });
@@ -1008,7 +1047,7 @@ function updateChecklist() {
     const el = document.getElementById('checklist1');
     if (el) { el.classList.add('done'); el.querySelector('.check-icon').textContent = '✓'; }
   }
-  if (quiz2Answered && quiz2Score >= 80) {
+  if (quiz2Answered && quiz2Score >= 60) {
     const el = document.getElementById('checklist2');
     if (el) { el.classList.add('done'); el.querySelector('.check-icon').textContent = '✓'; }
   }
@@ -1054,7 +1093,7 @@ function submitDialogue() {
   const lowerText = text.toLowerCase();
   let totalScore = 0;
   const keywordResults = quiz.expectedKeywords.map(kw => {
-    const found = lowerText.includes(kw.word.toLowerCase());
+    const found = kw.terms.some(t => lowerText.includes(t.toLowerCase()));
     if (found) totalScore += kw.weight;
     return { ...kw, found };
   });
@@ -1070,7 +1109,7 @@ function submitDialogue() {
   feedbackMsg += '<p style="font-size:13px;color:#64748b;margin-bottom:12px;">AI评估基于以下关键点检测：</p>';
   feedbackMsg += '<div class="keywords-result">';
   keywordResults.forEach(kr => {
-    feedbackMsg += '<span class="keyword-tag ' + (kr.found ? 'found' : 'missing') + '">' + (kr.found ? '✓' : '✗') + ' ' + kr.word + ' (' + kr.weight + '分)</span>';
+    feedbackMsg += '<span class="keyword-tag ' + (kr.found ? 'found' : 'missing') + '">' + (kr.found ? '✓' : '✗') + ' ' + kr.concept + ' (' + kr.weight + '分)</span>';
   });
   if (text.length >= 60) feedbackMsg += '<span class="keyword-tag found">✓ 回答长度充足 (+5分)</span>';
   if (text.length >= 120) feedbackMsg += '<span class="keyword-tag found">✓ 回答详尽 (+5分)</span>';
@@ -1078,10 +1117,10 @@ function submitDialogue() {
   const missingKeywords = keywordResults.filter(k => !k.found);
   if (missingKeywords.length > 0) {
     feedbackMsg += '<div style="margin-top:16px;padding:12px;background:#fef2f2;border-radius:8px;font-size:13px;color:#991b1b;"><strong>💡 优化建议：</strong>你的回答中缺少以下关键要素：<br>';
-    feedbackMsg += missingKeywords.map(k => '· <strong>' + k.word + '</strong>').join('<br>');
+    feedbackMsg += missingKeywords.map(k => '· <strong>' + k.concept + '</strong>').join('<br>');
     feedbackMsg += '<br>建议将这些要素融入回答中，使说服力更强。</div>';
   }
-  feedback.innerHTML = '<div class="score-display"><div class="score-circle ' + scoreLevel + '">' + quiz2Score + '</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">综合评分</div></div>' + feedbackMsg + (quiz2Score >= 80 ? '<div style="margin-top:12px;padding:12px;background:#ecfdf5;border-radius:8px;font-size:13px;color:#065f46;"><strong>✅ 练习通过！</strong>评分达到80分以上。</div>' : '');
+  feedback.innerHTML = '<div class="score-display"><div class="score-circle ' + scoreLevel + '">' + quiz2Score + '</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">综合评分</div></div>' + feedbackMsg + (quiz2Score >= 60 ? '<div style="margin-top:12px;padding:12px;background:#ecfdf5;border-radius:8px;font-size:13px;color:#065f46;"><strong>✅ 练习通过！</strong>评分达到60分以上。</div>' : '');
   feedback.classList.add('show');
   document.getElementById('submitDialogueBtn').disabled = true;
   input.disabled = true;
@@ -1246,7 +1285,7 @@ function loadProgress() {
   if (saved.finalScore) finalScore = saved.finalScore;
   if (saved.completedSections) completedSections = new Set(saved.completedSections);
   if (saved.currentSection !== undefined) currentSection = saved.currentSection;
-  setTimeout(() => { navigateTo(currentSection); updateChecklist(); }, 100);
+  setTimeout(() => { navigateTo(currentSection); updateSidebarLocks(); updateChecklist(); }, 100);
 }
 
 function saveProgress() {
@@ -1260,16 +1299,19 @@ function saveProgress() {
 
 // === Certificate ===
 function checkCertificate() {
-  if (quiz1Answered && quiz2Answered && quiz2Score >= 80 && finalTaskSubmitted) {
-    setTimeout(() => showCertificate(), 1500);
+  const allDone = completedSections.size >= courseData.sections.length
+    && quiz1Answered && quiz2Answered && quiz2Score >= 60
+    && finalTaskSubmitted && finalScore >= 60;
+  if (allDone) {
+    setTimeout(() => {
+      showToast('🏆 恭喜完成全部课程！点击领取结业证书', 'success');
+      document.getElementById('certStudentName').textContent = '请填写姓名';
+      document.getElementById('certScore').textContent = '综合评定：通过 · 对话练习 ' + quiz2Score + '分';
+      document.getElementById('certFinalScore').textContent = '终极考核得分：' + finalScore + ' 分';
+      document.getElementById('certDate').textContent = new Date().toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' });
+      document.getElementById('certOverlay').style.display = 'flex';
+    }, 1000);
   }
-}
-
-function showCertificate() {
-  const overlay = document.getElementById('certOverlay');
-  document.getElementById('certDate').textContent = new Date().toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' });
-  document.getElementById('certScore').textContent = '综合评定：通过 · 练习得分 ' + quiz2Score + '分 · 终极考核 ' + finalScore + '分';
-  overlay.style.display = 'flex';
 }
 
 function closeCertificate() {

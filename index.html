@@ -1278,16 +1278,29 @@ function saveNotes() {
 
 // === Progress Persistence ===
 function loadProgress() {
-  const saved = JSON.parse(localStorage.getItem('vipthink_math_progress') || '{}');
-  if (saved.quiz1Answered) quiz1Answered = true;
-  if (saved.quiz1Selected !== undefined) quiz1Selected = saved.quiz1Selected;
-  if (saved.quiz2Answered) quiz2Answered = true;
-  if (saved.quiz2Score) quiz2Score = saved.quiz2Score;
-  if (saved.finalTaskSubmitted) finalTaskSubmitted = true;
-  if (saved.finalScore) finalScore = saved.finalScore;
-  if (saved.completedSections) completedSections = new Set(saved.completedSections);
-  if (saved.currentSection !== undefined) currentSection = saved.currentSection;
-  setTimeout(() => { navigateTo(currentSection); updateSidebarLocks(); updateChecklist(); restoreQuizUI(); }, 100);
+  try {
+    const saved = JSON.parse(localStorage.getItem('vipthink_math_progress') || '{}');
+    if (saved.quiz1Answered) quiz1Answered = true;
+    if (saved.quiz1Selected !== undefined) quiz1Selected = saved.quiz1Selected;
+    if (saved.quiz2Answered) quiz2Answered = true;
+    if (saved.quiz2Score) quiz2Score = saved.quiz2Score;
+    if (saved.finalTaskSubmitted) finalTaskSubmitted = true;
+    if (saved.finalScore) finalScore = saved.finalScore;
+    if (saved.completedSections) completedSections = new Set(saved.completedSections);
+    if (saved.currentSection !== undefined) currentSection = saved.currentSection;
+    // Migration: old data without quiz1Selected → can't restore quiz UI, reset quiz states
+    if (quiz1Answered && quiz1Selected < 0) {
+      quiz1Answered = false;
+      quiz2Answered = false;
+      quiz2Score = 0;
+    }
+    // Validate currentSection is still accessible after potential resets
+    const navCheck = canNavigateTo(currentSection);
+    if (!navCheck.ok) currentSection = 0;
+    setTimeout(() => { navigateTo(currentSection); updateSidebarLocks(); updateChecklist(); restoreQuizUI(); }, 100);
+  } catch (e) {
+    navigateTo(0);
+  }
 }
 
 function saveProgress() {

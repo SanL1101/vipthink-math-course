@@ -885,6 +885,7 @@ const quizzes = {
 let currentSection = 0;
 let completedSections = new Set();
 let quiz1Answered = false;
+let quiz1Selected = -1;
 let quiz2Answered = false;
 let quiz2Score = 0;
 let finalTaskSubmitted = false;
@@ -897,12 +898,11 @@ let timerInterval = null;
 function init() {
   renderSidebar();
   renderSections();
-  navigateTo(0);
+  loadProgress();
   setupQuizListeners();
   setupFinalTaskListener();
   startTimer();
   loadNotes();
-  loadProgress();
 }
 
 function renderSidebar() {
@@ -1066,6 +1066,7 @@ function selectQuizOption(el, optionIndex, quizId) {
   quizCard.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected', 'correct', 'wrong'));
   el.classList.add('selected');
   quiz1Answered = true;
+  quiz1Selected = optionIndex;
   quizCard.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
   if (optionIndex === quiz.correct) {
     el.classList.add('correct');
@@ -1279,22 +1280,47 @@ function saveNotes() {
 function loadProgress() {
   const saved = JSON.parse(localStorage.getItem('vipthink_math_progress') || '{}');
   if (saved.quiz1Answered) quiz1Answered = true;
+  if (saved.quiz1Selected !== undefined) quiz1Selected = saved.quiz1Selected;
   if (saved.quiz2Answered) quiz2Answered = true;
   if (saved.quiz2Score) quiz2Score = saved.quiz2Score;
   if (saved.finalTaskSubmitted) finalTaskSubmitted = true;
   if (saved.finalScore) finalScore = saved.finalScore;
   if (saved.completedSections) completedSections = new Set(saved.completedSections);
   if (saved.currentSection !== undefined) currentSection = saved.currentSection;
-  setTimeout(() => { navigateTo(currentSection); updateSidebarLocks(); updateChecklist(); }, 100);
+  setTimeout(() => { navigateTo(currentSection); updateSidebarLocks(); updateChecklist(); restoreQuizUI(); }, 100);
 }
 
 function saveProgress() {
   localStorage.setItem('vipthink_math_progress', JSON.stringify({
-    quiz1Answered, quiz2Answered, quiz2Score,
+    quiz1Answered, quiz1Selected, quiz2Answered, quiz2Score,
     finalTaskSubmitted, finalScore,
     completedSections: [...completedSections],
     currentSection
   }));
+}
+
+function restoreQuizUI() {
+  if (quiz1Answered && quiz1Selected >= 0) {
+    const quizCard = document.getElementById('quiz-quiz1');
+    if (!quizCard) return;
+    const quiz = quizzes.quiz1;
+    const feedback = document.getElementById('feedback-quiz1');
+    const options = quizCard.querySelectorAll('.quiz-option');
+    options.forEach(o => o.style.pointerEvents = 'none');
+    const sel = options[quiz1Selected];
+    if (sel) {
+      if (quiz1Selected === quiz.correct) {
+        sel.classList.add('correct');
+        quizCard.classList.add('answered-correct');
+        if (feedback) { feedback.className = 'quiz-feedback show correct'; feedback.innerHTML = quiz.feedback_correct; }
+      } else {
+        sel.classList.add('wrong');
+        quizCard.classList.add('answered-wrong');
+        if (options[quiz.correct]) options[quiz.correct].classList.add('correct');
+        if (feedback) { feedback.className = 'quiz-feedback show wrong'; feedback.innerHTML = quiz.feedback_wrong; }
+      }
+    }
+  }
 }
 
 // === Certificate ===
@@ -1313,7 +1339,6 @@ function checkCertificate() {
     }, 1000);
   }
 }
-
 function closeCertificate() {
   document.getElementById('certOverlay').style.display = 'none';
 }

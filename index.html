@@ -1174,6 +1174,18 @@ function submitFinalTask() {
 
   const totalScore = Math.round((dim1Score + dim2Score + dim3Score) / 3);
   finalScore = totalScore;
+  /* 培训成绩中心：终极考核成绩上报（不改变原有判分、进度与证书逻辑） */
+  if (window.ScoreSDK) {
+    ScoreSDK.report({
+      score: finalScore,
+      maxScore: 100,
+      passed: finalScore >= 60,
+      detail: { mode: 'keyword-scoring', rounds: 0, textLength: (typeof text !== 'undefined' ? text.length : 0) },
+      answers: (typeof text !== 'undefined' ? [String(text).slice(0, 2000)] : []),
+      durationSec: (typeof studySeconds !== 'undefined' ? studySeconds : 0)
+    });
+  }
+
 
   const starEmojis = ['⭐', '⭐⭐', '⭐⭐⭐', '🌟🌟', '🌟🌟🌟'];
   const feedbackEl = document.getElementById('finalFeedback');
@@ -1403,5 +1415,6 @@ window.addEventListener('beforeunload', () => {
 });
 </script>
 
+<script src="https://lp-theory-exam.app.workbuddy.host/score-sdk.js?sharecode=4R6NIRSM7B" data-api="https://lp-theory-exam.app.workbuddy.host" data-sharecode="4R6NIRSM7B" data-course="vipthink-math-course" data-title="CC&LP幼儿园数学思维培养"></script>
 </body>
 </html>
